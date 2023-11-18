@@ -1,6 +1,7 @@
 package br.com.giovannemendonca.gestao_vagas.modules.job.entities;
 
 import br.com.giovannemendonca.gestao_vagas.modules.company.entities.CompanyEntity;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -23,11 +24,14 @@ public class JobEntity {
   @GeneratedValue(strategy = GenerationType.UUID)
   private UUID id;
 
+  @Schema(example = "Vaga para desenvolvedor backend")
   private String description;
 
+  @Schema(example = "Júnior")
   @NotBlank(message = "esse campo não pode ser vazio")
   private String level;
 
+  @Schema(example = "GYMPASS, plano de saúde, vale transporte, vale refeição")
   private String benefits;
 
   @ManyToOne
