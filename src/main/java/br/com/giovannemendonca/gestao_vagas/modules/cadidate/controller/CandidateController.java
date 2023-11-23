@@ -2,6 +2,7 @@ package br.com.giovannemendonca.gestao_vagas.modules.cadidate.controller;
 
 import br.com.giovannemendonca.gestao_vagas.modules.cadidate.dto.ProfileCandidateResponseDTO;
 import br.com.giovannemendonca.gestao_vagas.modules.cadidate.entities.CandidateEntity;
+import br.com.giovannemendonca.gestao_vagas.modules.cadidate.useCases.ApplyJobCandidateUseCase;
 import br.com.giovannemendonca.gestao_vagas.modules.cadidate.useCases.CreateCandidateUseCase;
 import br.com.giovannemendonca.gestao_vagas.modules.cadidate.useCases.ListAllJobsByFilterUseCase;
 import br.com.giovannemendonca.gestao_vagas.modules.cadidate.useCases.ProfileCandidateUseCase;
@@ -38,17 +39,18 @@ public class CandidateController {
   @Autowired
   private ListAllJobsByFilterUseCase listAllJobsByFilterUseCase;
 
+  @Autowired
+  private ApplyJobCandidateUseCase applyJobCandidateUseCase;
 
   @PostMapping("/")
   @Operation(summary = "Cadastrar candidato", description = "essa função cadastra um novo candidato")
   @ApiResponses({
-          @ApiResponse(responseCode = "200", description = "Candidato cadastrado com sucesso", content = {
-                  @Content(schema = @Schema(implementation = CandidateEntity.class))
-          }),
-          @ApiResponse(responseCode = "400", description = "Erro ao cadastrar candidato")
+      @ApiResponse(responseCode = "200", description = "Candidato cadastrado com sucesso", content = {
+          @Content(schema = @Schema(implementation = CandidateEntity.class))
+      }),
+      @ApiResponse(responseCode = "400", description = "Erro ao cadastrar candidato")
   })
   public ResponseEntity<Object> create(@Validated @RequestBody CandidateEntity candidateEntity) {
-
 
     try {
       var result = this.createCandidateUseCase.execute(candidateEntity);
@@ -63,10 +65,10 @@ public class CandidateController {
   @Operation(summary = "Perfil do candidato", description = "essa função retorna todas as informações do candidato")
   @SecurityRequirement(name = "jwt_auth")
   @ApiResponses({
-          @ApiResponse(responseCode = "200", content = {
-                  @Content(schema = @Schema(implementation = ProfileCandidateResponseDTO.class))
-          }),
-          @ApiResponse(responseCode = "400", description = "User not found")
+      @ApiResponse(responseCode = "200", content = {
+          @Content(schema = @Schema(implementation = ProfileCandidateResponseDTO.class))
+      }),
+      @ApiResponse(responseCode = "400", description = "User not found")
   })
   public ResponseEntity<Object> get(HttpServletRequest request) {
 
@@ -84,8 +86,25 @@ public class CandidateController {
   @PreAuthorize("hasRole('CANDIDATE')")
   @Operation(summary = "Listar vagas disponíveis para candidato", description = "essa função retorna todas as vagas disponíveis por filtro")
   @SecurityRequirement(name = "jwt_auth")
-  @ApiResponse(responseCode = "200", content = {@Content(array = @ArraySchema(schema = @Schema(implementation = JobEntity.class)))})
+  @ApiResponse(responseCode = "200", content = {
+      @Content(array = @ArraySchema(schema = @Schema(implementation = JobEntity.class))) })
   public List<JobEntity> findJobByFilter(@RequestParam String filter) {
     return this.listAllJobsByFilterUseCase.execute(filter);
   }
+
+  @PostMapping("/job/apply")
+  @PreAuthorize("hasRole('CANDIDATE')")
+  @SecurityRequirement(name = "jwt_auth")
+  @Operation(summary = "Inscrição do candidato em uma vaga", description = "essa função inscreve o candidato em uma vaga")
+  public ResponseEntity<Object> applyJob(HttpServletRequest request, @RequestBody UUID idJob) {
+
+    var idCandidate = request.getAttribute("candidate_id");
+    try {
+      var result = this.applyJobCandidateUseCase.execute(UUID.fromString(idCandidate.toString()), idJob);
+      return ResponseEntity.ok().body(result);
+    } catch (Exception e) {
+      return ResponseEntity.badRequest().body(e.getMessage());
+    }
+  }
+
 }
