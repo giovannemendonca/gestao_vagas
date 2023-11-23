@@ -8,7 +8,11 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -16,6 +20,9 @@ import java.util.UUID;
 
 @Entity(name = "company")
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class CompanyEntity {
 
   @Id
@@ -23,7 +30,7 @@ public class CompanyEntity {
   private UUID id;
 
   @NotBlank
-  @Pattern(regexp = "^[a-z0-9_-]{3,15}$", message = "O username deve conter apenas letras minusculas, numeros, _ e -")
+@Pattern(regexp = "^[a-zA-Z][a-zA-Z0-9_-]*$", message = "O username deve conter apenas letras minusculas, numeros, _ e -")
   private String username;
 
   @Email(message = "O email deve ser válido")
