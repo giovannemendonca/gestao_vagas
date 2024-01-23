@@ -5,7 +5,6 @@ import br.com.giovannemendonca.gestao_vagas.modules.cadidate.dto.AuthCandidateRe
 import br.com.giovannemendonca.gestao_vagas.modules.cadidate.repositories.CandidateRepository;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,11 +21,14 @@ public class AuthCandidateUseCase {
   @Value("${security.token.secret.candidate}")
   private String secretKey;
 
-  @Autowired
   CandidateRepository candidateRepository;
 
-  @Autowired
   PasswordEncoder passwordEncoder;
+
+  AuthCandidateUseCase(CandidateRepository candidateRepository, PasswordEncoder passwordEncoder) {
+    this.candidateRepository = candidateRepository;
+    this.passwordEncoder = passwordEncoder;
+  }
 
   public AuthCandidateResponseDTO execute(AuthCandidateRequestDTO authCandidateRequestDTO) throws AuthenticationException {
 
@@ -49,12 +51,10 @@ public class AuthCandidateUseCase {
             .withSubject(candidate.getId().toString())
             .sign(algorithm);
 
-    var authCandidateResponse = AuthCandidateResponseDTO.builder()
+    return AuthCandidateResponseDTO.builder()
             .access_token(token)
             .expires_in(expiresIn.toEpochMilli()) // esse toEpochMilli() é para retornar em milisegundos
             .build();
-
-    return authCandidateResponse;
 
   }
 

@@ -4,24 +4,24 @@ import br.com.giovannemendonca.gestao_vagas.exceptions.CompanyNotFoundException;
 import br.com.giovannemendonca.gestao_vagas.modules.company.repositories.CompanyRepository;
 import br.com.giovannemendonca.gestao_vagas.modules.job.entities.JobEntity;
 import br.com.giovannemendonca.gestao_vagas.modules.job.repositories.JobRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CreateJobUseCase {
 
-  @Autowired
   private JobRepository jobRepository;
 
-  @Autowired
   private CompanyRepository companyRepository;
+
+  CreateJobUseCase(JobRepository jobRepository, CompanyRepository companyRepository) {
+    this.jobRepository = jobRepository;
+    this.companyRepository = companyRepository;
+  }
 
   public JobEntity execute(JobEntity jobEntity) {
 
-    this.companyRepository.findById(jobEntity.getCompanyId())
-      .orElseThrow(() -> {
-       throw new CompanyNotFoundException();
-      });
+     this.companyRepository.findById(jobEntity.getCompanyId())
+      .orElseThrow(CompanyNotFoundException::new);
     return jobRepository.save(jobEntity);
 
   }

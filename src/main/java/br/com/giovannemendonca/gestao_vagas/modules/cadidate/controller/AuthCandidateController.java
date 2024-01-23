@@ -2,7 +2,6 @@ package br.com.giovannemendonca.gestao_vagas.modules.cadidate.controller;
 
 import br.com.giovannemendonca.gestao_vagas.modules.cadidate.dto.AuthCandidateRequestDTO;
 import br.com.giovannemendonca.gestao_vagas.modules.cadidate.useCases.AuthCandidateUseCase;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,8 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/candidate")
 public class AuthCandidateController {
 
-  @Autowired
   private AuthCandidateUseCase authCandidateUseCase;
+
+  AuthCandidateController(AuthCandidateUseCase authCandidateUseCase) {
+    this.authCandidateUseCase = authCandidateUseCase;
+  }
 
   @PostMapping("/auth")
   public ResponseEntity<Object> auth(@RequestBody AuthCandidateRequestDTO authCandidateDTO) {

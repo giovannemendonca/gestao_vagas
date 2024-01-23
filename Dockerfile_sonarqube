@@ -1,0 +1,13 @@
+# Use a imagem base do SonarQube
+FROM sonarqube:9.9.3-community
+
+# Desative as verificações de bootstrap do Elasticsearch
+ENV SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
+
+# Exponha a porta 9000
+EXPOSE 9000
+
+# Nomeie o contêiner como "sonarqube"
+--name sonarqube
+
+

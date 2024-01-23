@@ -1,28 +1,30 @@
 package br.com.giovannemendonca.gestao_vagas.modules.cadidate.useCases;
 
-import java.util.UUID;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import br.com.giovannemendonca.gestao_vagas.exceptions.JobNotFoundException;
 import br.com.giovannemendonca.gestao_vagas.exceptions.UserNotFoundException;
 import br.com.giovannemendonca.gestao_vagas.modules.cadidate.entities.ApplyJobEntity;
 import br.com.giovannemendonca.gestao_vagas.modules.cadidate.repositories.ApplyJobRepository;
 import br.com.giovannemendonca.gestao_vagas.modules.cadidate.repositories.CandidateRepository;
 import br.com.giovannemendonca.gestao_vagas.modules.job.repositories.JobRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 public class ApplyJobCandidateUseCase {
   
-  @Autowired
   private CandidateRepository candidateRepository;
 
-  @Autowired
   private ApplyJobRepository applyJobRepository;
   
-  @Autowired 
   private JobRepository jobRepository;
+
+
+  ApplyJobCandidateUseCase(CandidateRepository candidateRepository, ApplyJobRepository applyJobRepository, JobRepository jobRepository){
+    this.candidateRepository = candidateRepository;
+    this.applyJobRepository = applyJobRepository;
+    this.jobRepository = jobRepository;
+  }
   
   public ApplyJobEntity execute(UUID idCandidate, UUID idJob){
 

@@ -1,6 +1,5 @@
 package br.com.giovannemendonca.gestao_vagas.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -14,11 +13,14 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 @EnableMethodSecurity
 public class SecurityConfig {
 
-  @Autowired
-  private SecurityFilter securityFilter;
+  private SecurityCompanyFilter securityCompanyFilter;
 
-  @Autowired
   private SecurityCandidateFilter securityCandidateFilter;
+
+  SecurityConfig(SecurityCompanyFilter securityCompanyFilter, SecurityCandidateFilter securityCandidateFilter){
+    this.securityCompanyFilter = securityCompanyFilter;
+    this.securityCandidateFilter = securityCandidateFilter;
+  }
 
   private static final String[] SWAGGER_LIST = {
           "/swagger-ui/**",
@@ -30,7 +32,7 @@ public class SecurityConfig {
   @Bean
   SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-    http.csrf(csrf -> csrf.disable())
+    http.csrf(csrf -> csrf.disable()) //Compliant
             .authorizeHttpRequests(auth -> {
               auth
                       .requestMatchers("/candidate/").permitAll()
@@ -43,7 +45,7 @@ public class SecurityConfig {
               auth.anyRequest().authenticated();
             })
             .addFilterBefore(securityCandidateFilter, BasicAuthenticationFilter.class)
-            .addFilterBefore(securityFilter, BasicAuthenticationFilter.class);
+            .addFilterBefore(securityCompanyFilter, BasicAuthenticationFilter.class);
 
     return http.build();
   }

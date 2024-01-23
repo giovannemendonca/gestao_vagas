@@ -12,11 +12,9 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -30,26 +28,32 @@ import java.util.UUID;
 @Tag(name = "Candidato", description = "Informações do candidato")
 public class CandidateController {
 
-  @Autowired
   private CreateCandidateUseCase createCandidateUseCase;
 
-  @Autowired
   private ProfileCandidateUseCase profileCandidateUseCase;
 
-  @Autowired
   private ListAllJobsByFilterUseCase listAllJobsByFilterUseCase;
 
-  @Autowired
   private ApplyJobCandidateUseCase applyJobCandidateUseCase;
+
+  CandidateController(
+      CreateCandidateUseCase createCandidateUseCase,
+      ProfileCandidateUseCase profileCandidateUseCase,
+      ListAllJobsByFilterUseCase listAllJobsByFilterUseCase,
+      ApplyJobCandidateUseCase applyJobCandidateUseCase
+  ) {
+    this.createCandidateUseCase = createCandidateUseCase;
+    this.profileCandidateUseCase = profileCandidateUseCase;
+    this.listAllJobsByFilterUseCase = listAllJobsByFilterUseCase;
+    this.applyJobCandidateUseCase = applyJobCandidateUseCase;
+  }
 
   @PostMapping("/")
   @Operation(summary = "Cadastrar candidato", description = "essa função cadastra um novo candidato")
-  @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "Candidato cadastrado com sucesso", content = {
-          @Content(schema = @Schema(implementation = CandidateEntity.class))
-      }),
-      @ApiResponse(responseCode = "400", description = "Erro ao cadastrar candidato")
+  @ApiResponse(responseCode = "200", content = {
+          @Content(schema = @Schema(implementation = ProfileCandidateResponseDTO.class))
   })
+  @ApiResponse(responseCode = "400", description = "User not found")
   public ResponseEntity<Object> create(@Validated @RequestBody CandidateEntity candidateEntity) {
 
     try {
@@ -64,12 +68,10 @@ public class CandidateController {
   @PreAuthorize("hasRole('CANDIDATE')")
   @Operation(summary = "Perfil do candidato", description = "essa função retorna todas as informações do candidato")
   @SecurityRequirement(name = "jwt_auth")
-  @ApiResponses({
-      @ApiResponse(responseCode = "200", content = {
+  @ApiResponse(responseCode = "200", content = {
           @Content(schema = @Schema(implementation = ProfileCandidateResponseDTO.class))
-      }),
-      @ApiResponse(responseCode = "400", description = "User not found")
   })
+  @ApiResponse(responseCode = "400", description = "User not found")
   public ResponseEntity<Object> get(HttpServletRequest request) {
 
     var idCandidate = request.getAttribute("candidate_id");
